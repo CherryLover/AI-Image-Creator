@@ -128,14 +128,16 @@ def prepare_img_dir():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         raise Exception("Please input gemini key")
     GEMINI_KEY = sys.argv[1]
+    count = int(sys.argv[2]) + 1
+    sys.stdout.write(f"Count: {count}\n")
 
     sys.stdout.write("Hello World!")
     current_run_dir = prepare_img_dir()
     sys.stdout.write(f"Current run dir: {current_run_dir}\n")
-    for i in range(4):
+    for i in range(count):
         sys.stdout.write(f"Round {i}\n")
         try:
             prompt = generate_random_prompt()
