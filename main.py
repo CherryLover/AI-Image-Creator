@@ -12,6 +12,7 @@ import base64
 import requests
 import logging
 import random
+import traceback
 from http.client import HTTPConnection
 
 
@@ -78,18 +79,18 @@ def judge_image_by_gemini(file_path):
         file_base64 = base64.b64encode(f.read()).decode()
 
     prompt = """
-Please assess and score this image as a demanding fine artist on the following scale:
+    请你以一位对艺术要求严苛的美术家的身份对这张图片进行评估并打分，具体的打分标准如下：
     
-    1. technical competence (15 marks): assess the clarity of line, the choice and use of colour, the composition and layout of the work, and the use of materials.
-    2. Creativity (15 marks): assesses the creativity of the work, including novel ideas, unique expressions, and unique perspectives.
-    3. clarity of subject matter (15 marks): assesses whether the subject matter of the work is clear and whether the author's intention can be understood intuitively.
-    4. Emotional expression (15 points): assesses whether the author has succeeded in conveying emotions through the work and whether the viewer can feel these emotions.
-    5. Appreciation (10 points): assesses the appreciation of the work, including whether it attracts the viewer's attention and whether it has a certain degree of artistic appeal.
-    6. Social/Cultural Impact (10 points): Assess the social or cultural impact of the work, such as whether the work reflects social phenomena and whether it has deep cultural connotations.
-    7. Scene realism (10 points): assess the realism of the author in depicting the scene, including colour, light and proportion.
-    8. Completeness of Portraits (10 points): If the work contains portraits, assess whether the portrayal of the characters' features and limbs is accurate, and whether their expressions and postures are natural.
+    1. 技术能力（15分）：评判线条清晰度，颜色的选择和使用，作品的构图和布局，以及材料的使用。
+    2. 创新性（15分）：评估作品的创新性，包括新颖的想法，独特的表达方式，和独特的视角。
+    3. 主题清晰度（15分）：评价作品的主题是否清晰，是否能直观地理解作者的意图。
+    4. 情感表达（15分）：评定作者是否能成功地通过作品传达情感，以及观者是否能感受到这些情感。
+    5. 观赏性（10分）：评估作品的观赏性，包括能否吸引观者的注意力，以及是否具有一定的艺术魅力。
+    6. 社会/文化影响力（10分）：评判作品的社会或文化影响力，如作品是否反映了社会现象，是否有深度的文化内涵。
+    7. 场景真实度（10分）：评估作者在描绘场景时的真实度，包括色彩，光线，比例等方面。
+    8. 人像五官及肢体完整性（10分）：如果作品中包含人像，评估人物的五官和肢体描绘是否准确，表情和姿态是否自然。
     
-    Only return a json with two fields: score and comment. score is an integer from 0-100 and comment is a string with no more than 50 characters. Thank you for your help.
+    只返回一个 json，包含两个字段：score 和 comment。score 是一个 0-100 的整数，comment 是一个字符串，不超过 50 个字。谢谢
     """
     json_data = {
         "contents": [
@@ -133,7 +134,7 @@ if __name__ == '__main__':
 
     sys.stdout.write("Hello World!")
     current_run_dir = prepare_img_dir()
-    sys.stdout.write(f"Current run dir: {current_run_dir}")
+    sys.stdout.write(f"Current run dir: {current_run_dir}\n")
     for i in range(4):
         sys.stdout.write(f"Round {i}\n")
         try:
@@ -142,9 +143,9 @@ if __name__ == '__main__':
             if not generate_image_by_sd_file_path:
                 sys.stdout.write(f"generateImageBySd failed --> {generate_image_by_sd_file_path}\n ")
                 continue
-            judge_image_by_gemini = judge_image_by_gemini(generate_image_by_sd_file_path)
-            report_image(prompt, generate_image_by_sd_file_path, judge_image_by_gemini)
+            judge_info = judge_image_by_gemini(generate_image_by_sd_file_path)
+            report_image(prompt, generate_image_by_sd_file_path, judge_info)
         except Exception as e:
-            sys.stdout.write(f"Exception: {e}")
+            traceback.print_exc()
         time.sleep(30)
 
