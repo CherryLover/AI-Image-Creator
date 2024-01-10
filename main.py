@@ -35,7 +35,7 @@ def report_image(prompt, generate_image_by_sd_file_path, judge_image_by_gemini):
         'platform': 'sd'
     }
     response = requests.post(url, files=files, data=data)
-    print(response.text)
+    sys.stdout.write(response.text)
 
 
 def generate_random_prompt():
@@ -58,7 +58,7 @@ def generate_image_by_sd(prompt):
 
     sty = styles[int(time.time()) % len(styles)]
     final_prompt = f"Please paint a {prompt} in the {sty}."
-    print(f"finalPrompt: {final_prompt}")
+    sys.stdout.write(f"finalPrompt: {final_prompt}")
     data = {
         'prompt': final_prompt
     }
@@ -114,7 +114,7 @@ Please assess and score this image as a demanding fine artist on the following s
     response_text = response_text['candidates'][0]['content']['parts'][0]['text'].replace("\n", "").strip()
     if response_text.startswith("```json"):
         response_text = response_text[7:-3]
-    print(response_text)
+    sys.stdout.write(response_text)
     return json.loads(response_text)
 
 
@@ -129,20 +129,20 @@ if __name__ == '__main__':
         raise Exception("Please input gemini key")
     GEMINI_KEY = sys.argv[1]
 
-    print("Hello World!")
+    sys.stdout.write("Hello World!")
     current_run_dir = prepare_img_dir()
-    print(f"Current run dir: {current_run_dir}")
+    sys.stdout.write(f"Current run dir: {current_run_dir}")
     for i in range(20):
-        print(f"Round {i}")
+        sys.stdout.write(f"Round {i}")
         try:
             prompt = generate_random_prompt()
             generate_image_by_sd_file_path = generate_image_by_sd(prompt)
             if not generate_image_by_sd_file_path:
-                print("generateImageBySd failed")
+                sys.stdout.write("generateImageBySd failed")
                 continue
             judge_image_by_gemini = judge_image_by_gemini(generate_image_by_sd_file_path)
             report_image(prompt, generate_image_by_sd_file_path, judge_image_by_gemini)
         except Exception as e:
-            print(e)
+            sys.stdout.write(e)
         time.sleep(30)
 
