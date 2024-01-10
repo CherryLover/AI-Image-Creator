@@ -58,7 +58,7 @@ def generate_image_by_sd(prompt):
 
     sty = styles[int(time.time()) % len(styles)]
     final_prompt = f"Please paint a {prompt} in the {sty}."
-    sys.stdout.write(f"finalPrompt: {final_prompt}")
+    sys.stdout.write(f"finalPrompt: {final_prompt}\n")
     data = {
         'prompt': final_prompt
     }
@@ -68,6 +68,8 @@ def generate_image_by_sd(prompt):
     file_path = os.path.join(prepare_img_dir(), f"{int(time.time())}.png")
     with open(file_path, "wb") as f:
         f.write(response.content)
+    f.close()
+    sys.stdout.write(f"file_path: {file_path}\n")
     return file_path
 
 
@@ -133,12 +135,12 @@ if __name__ == '__main__':
     current_run_dir = prepare_img_dir()
     sys.stdout.write(f"Current run dir: {current_run_dir}")
     for i in range(4):
-        sys.stdout.write(f"Round {i}")
+        sys.stdout.write(f"Round {i}\n")
         try:
             prompt = generate_random_prompt()
             generate_image_by_sd_file_path = generate_image_by_sd(prompt)
             if not generate_image_by_sd_file_path:
-                sys.stdout.write("generateImageBySd failed")
+                sys.stdout.write(f"generateImageBySd failed --> {generate_image_by_sd_file_path}\n ")
                 continue
             judge_image_by_gemini = judge_image_by_gemini(generate_image_by_sd_file_path)
             report_image(prompt, generate_image_by_sd_file_path, judge_image_by_gemini)
