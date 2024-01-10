@@ -132,7 +132,7 @@ if __name__ == '__main__':
     sys.stdout.write("Hello World!")
     current_run_dir = prepare_img_dir()
     sys.stdout.write(f"Current run dir: {current_run_dir}")
-    for i in range(20):
+    for i in range(4):
         sys.stdout.write(f"Round {i}")
         try:
             prompt = generate_random_prompt()
@@ -143,6 +143,6 @@ if __name__ == '__main__':
             judge_image_by_gemini = judge_image_by_gemini(generate_image_by_sd_file_path)
             report_image(prompt, generate_image_by_sd_file_path, judge_image_by_gemini)
         except Exception as e:
-            sys.stdout.write(e)
+            sys.stdout.write(f"Exception: {e}")
         time.sleep(30)
 
