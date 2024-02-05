@@ -17,7 +17,7 @@ if __name__ == '__main__':
     TG_KEY = sys.argv[2]
     UNSPLASH_KEY = sys.argv[3]
 
-    sys.stdout.write("Hello World!")
-    cf_sd_creator.draw(GEMINI_KEY)
-    unsplash.get_random_image(UNSPLASH_KEY, TG_KEY)
+    print("Hello World!")
+    # cf_sd_creator.draw(GEMINI_KEY)
+    unsplash.get_random_image(GEMINI_KEY, UNSPLASH_KEY, TG_KEY)
 
