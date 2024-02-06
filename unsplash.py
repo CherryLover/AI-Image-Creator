@@ -143,6 +143,11 @@ def get_random_image(gemini_key, unsplash_key, tg_key):
     send_to_tg(sd_path, TG_KEY, prompt, None)
 
     dalle_draw_map = generate_image_by_dalle(prompt)
+    if not isinstance(dalle_draw_map, dict):
+        if isinstance(dalle_draw_map, str):
+            print(dalle_draw_map)
+        print("dalle draw request failed")
+        return
     request_id = dalle_draw_map['requestId']
     print("requestId: " + request_id)
     # 休眠 30s，等待图片生成
@@ -214,6 +219,8 @@ def generate_image_by_dalle(prompt):
     }
     response = requests.post(url, json=data, headers=head)
     if response.status_code != 200:
+        print(f"request dalle failed {response.status_code}")
+        print(response.text)
         return ""
     return response.json()
 
