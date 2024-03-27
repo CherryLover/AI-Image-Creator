@@ -19,8 +19,10 @@ from urllib3.connection import HTTPConnection
 
 orientation_list = ["landscape", "portrait", "squarish"]
 
-GEMINI_KEY = "AIzaSyD24oWO1cWAn8keEpZCAe9fa6sdXIagd-I"
+GEMINI_KEY = "I"
 TG_KEY = "sdfsf"
+OPEN_AI_KEY = "sk-8"
+OPEN_AI_HOST = "api.openai.com"
 
 
 def download_img_pure(url, file_name):
@@ -109,11 +111,15 @@ def get_image_desc_by_gemini(file_path):
     return response_text
 
 
-def get_random_image(gemini_key, unsplash_key, tg_key):
+def get_random_image(gemini_key, unsplash_key, tg_key, open_ai_host, open_ai_key):
     global GEMINI_KEY
     GEMINI_KEY = gemini_key
     global TG_KEY
     TG_KEY = tg_key
+    global OPEN_AI_KEY
+    OPEN_AI_KEY = open_ai_key
+    global OPEN_AI_HOST
+    OPEN_AI_HOST = open_ai_host
     orientation = random.choice(orientation_list)
     url = f'https://api.unsplash.com/photos/random?client_id={unsplash_key}&count=1&orientation={orientation}'
     response = requests.get(url)
@@ -140,31 +146,15 @@ def get_random_image(gemini_key, unsplash_key, tg_key):
     if not prompt:
         prompt = get_image_desc_by_gemini(file_path_map['small'])
     sd_path = generate_image_by_sd(prompt)
-    send_to_tg(sd_path, TG_KEY, prompt, None)
-
-    dalle_draw_map = generate_image_by_dalle(prompt)
-    if not isinstance(dalle_draw_map, dict):
-        if isinstance(dalle_draw_map, str):
-            print(dalle_draw_map)
-        print("dalle draw request failed")
-        return
-    request_id = dalle_draw_map['requestId']
-    print("requestId: " + request_id)
-    # 休眠 30s，等待图片生成
-    print("waiting 30s......")
-    time.sleep(30)
-    imgs = query_dalle_result(request_id, prompt)
-    while len(imgs) == 0:
-        print("waiting 10s......")
-        time.sleep(10)
-        imgs = query_dalle_result(request_id, prompt)
-    send_to_tg_media_group(imgs, TG_KEY, "test", None)
+    send_to_tg(sd_path, TG_KEY, "Cloudflare Stable Diffusion Draw: " + prompt, None)
+    dalle_path = generate_image_by_dalle(prompt)
+    send_to_tg(dalle_path, TG_KEY, "Dall-E-3 Draw: " + prompt, None)
 
 
 def download_img(img_id, img_urls):
     prepare_img_dir()
     full_img_url = img_urls['full']
-    small_img_url = img_urls['small']
+    small_img_url = img_urls['full']
 
     # tg 无法发送大图，不过也没必要了，有个 View on Unsplash 的按钮，可以直接跳转到原图
     # img_response = requests.get(full_img_url)
@@ -205,50 +195,33 @@ def generate_image_by_sd(prompt):
 
 
 def generate_image_by_dalle(prompt):
-    url = "https://ai-image-creator.jiwzdj.workers.dev/draw"
-
+    url = f"https://{OPEN_AI_HOST}/v1/images/generations"
     final_prompt = f"{prompt}."
     print(f"finalPrompt: {final_prompt}\n")
     data = {
         'prompt': final_prompt,
-        'owner': 'monster',
-        'platform': 'Dall-E'
+        'n': 1,
+        'model': 'dall-e-3',
+        'size': '1024x1024'
     }
     head = {
-        'x-token': '1uf0xfp%7C2%7Cfii%7C0%7C1478'
+        'Authorization': f'Bearer {OPEN_AI_KEY}'
     }
     response = requests.post(url, json=data, headers=head)
     if response.status_code != 200:
         print(f"request dalle failed {response.status_code}")
         print(response.text)
         return ""
-    return response.json()
-
-
-def query_dalle_result(request_id, prompt):
-    url = "https://ai-image-creator.jiwzdj.workers.dev/queryDallEResult?requestId=" + request_id
-    head = {
-        'x-token': '1uf0xfp%7C2%7Cfii%7C0%7C1478'
-    }
-    response = requests.get(url, headers=head)
+    print(response.json())
+    file_url = response.json()['data'][0]['url']
+    if not file_url:
+        return ""
+    response = requests.get(file_url)
     if response.status_code != 200:
         return ""
-    text = response.text
-    if "In Progress" in text:
-        return []
-    print(text)
-    result_json = json.loads(text)
-    attempt_img = result_json['images']
-    # 判断 attempt_img 类型是否为 list,
-    # 如果是 list 类型，直接返回
-    if isinstance(attempt_img, list):
-        return attempt_img
-    # 如果不是 list 类型，尝试解析为 json
-    images = []
-    print("attempt_img text " + json.dumps(attempt_img))
-    print("attempt_img type " + str(type(attempt_img)))
-    try:
-        images = json.loads(attempt_img)
-    except Exception as e:
-        print(e)
-    return images
+    file_path = os.path.join(prepare_img_dir(), f"dalle_{int(time.time())}.png")
+    with open(file_path, "wb") as f:
+        f.write(response.content)
+    f.close()
+    print(f"file_path: {file_path}\n")
+    return file_path
