@@ -1,8 +1,8 @@
 name: Python application
 
 on:
+  workflow_dispatch:
   schedule:
-
     - cron:  '30 0 * * *'
   push:
     branches: [ main ]
@@ -24,4 +24,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run script
       run: |
-        python main.py ${{ secrets.GEMINI_API_KEY }} ${{ secrets.TG_SENDER_KEY }} ${{ secrets.UNSPLASH_KEY }}
+        python main.py ${{ secrets.TG_BOT_TOKEN }} ${{ secrets.TG_CHAT_ID }} ${{ secrets.UNSPLASH_KEY }} ${{ secrets.OPENAI_HOST }} ${{ secrets.OPENAI_KEY }}
