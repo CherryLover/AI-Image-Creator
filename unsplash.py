@@ -23,6 +23,7 @@ GEMINI_KEY = "I"
 TG_KEY = "sdfsf"
 OPEN_AI_KEY = "sk-8"
 OPEN_AI_HOST = "api.openai.com"
+TG_CHAT_ID = 0
 
 
 def download_img_pure(url, file_name):
@@ -40,31 +41,30 @@ def prepare_img_dir():
     return dir_path
 
 
-def send_to_tg(img_file_path, tg_key, message, buttons):
-    url = f'https://tg-sender.flyooo.uk/sendPhoto?bot=AIImage'
+def send_to_tg(img_file_path, message, buttons):
+    url = f'https://api.telegram.org/bot{TG_KEY}/sendPhoto?bot=AIImage'
     files = {'photo': open(img_file_path, 'rb')}
-    data = {'caption': message}
+    data = {'caption': message, 'chat_id': TG_CHAT_ID}
     if buttons:
         data['reply_markup'] = buttons
-    headers = {'Authorization': f'{tg_key}'}
-    response = requests.post(url, files=files, data=data, headers=headers)
+    response = requests.post(url, files=files, data=data)
     if response.status_code != 200:
         print(response.text)
         raise Exception(f"Unexpected code {response.status_code}")
 
 
-def send_to_tg_media_group(img_file_url_list, tg_key, message, buttons):
+# 用于批量发送，DALL-E 3 可以生成多张图片
+def send_to_tg_media_group(img_file_url_list, message, buttons):
     if len(img_file_url_list) < 1:
         return
-    url = f'https://tg-sender.flyooo.uk/sendMediaGroup?bot=AIImage'
+    url = f'https://api.telegram.org/bot{TG_KEY}/sendMediaGroup'
     media = []
     for img_file_url in img_file_url_list:
         media.append({'type': 'photo', 'media': img_file_url, 'caption': message, 'parse_mode': 'Markdown'})
-    data = {'media': media, 'chat_id': '799133753'}
+    data = {'media': media, 'chat_id': TG_CHAT_ID}
     if buttons:
         data['reply_markup'] = buttons
-    headers = {'Authorization': f'{tg_key}'}
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.post(url, json=data)
     if response.status_code != 200:
         print(response.text)
         raise Exception(f"Unexpected code {response.status_code}")
@@ -111,11 +111,13 @@ def get_image_desc_by_gemini(file_path):
     return response_text
 
 
-def get_random_image(gemini_key, unsplash_key, tg_key, open_ai_host, open_ai_key):
+def get_random_image(gemini_key, unsplash_key, tg_key, tg_chat_id, open_ai_host, open_ai_key):
     global GEMINI_KEY
     GEMINI_KEY = gemini_key
     global TG_KEY
     TG_KEY = tg_key
+    global TG_CHAT_ID
+    TG_CHAT_ID = tg_chat_id
     global OPEN_AI_KEY
     OPEN_AI_KEY = open_ai_key
     global OPEN_AI_HOST
@@ -140,15 +142,15 @@ def get_random_image(gemini_key, unsplash_key, tg_key, open_ai_host, open_ai_key
 
     file_path_map = download_img(img_id, img_urls)
     tg_button = f'{{"inline_keyboard":[[{{"text":"View on Unsplash","url":"{link}"}}]]}}'
-    send_to_tg(file_path_map['full'], tg_key, message, tg_button)
+    send_to_tg(file_path_map['full'], message, tg_button)
 
     prompt = response_text[0]['alt_description']
     if not prompt:
         prompt = get_image_desc_by_gemini(file_path_map['small'])
     sd_path = generate_image_by_sd(prompt)
-    send_to_tg(sd_path, TG_KEY, "Cloudflare Stable Diffusion Draw: " + prompt, None)
+    send_to_tg(sd_path, "Cloudflare Stable Diffusion Draw: " + prompt, None)
     dalle_path = generate_image_by_dalle(prompt)
-    send_to_tg(dalle_path, TG_KEY, "Dall-E-3 Draw: " + prompt, None)
+    send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
 
 
 def download_img(img_id, img_urls):
