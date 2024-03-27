@@ -53,6 +53,15 @@ def send_to_tg(img_file_path, message, buttons):
         raise Exception(f"Unexpected code {response.status_code}")
 
 
+def send_to_tg_msg(message):
+    url = f'https://api.telegram.org/bot{TG_KEY}/sendMessage'
+    data = {'text': message, 'chat_id': TG_CHAT_ID}
+    response = requests.post(url, json=data)
+    if response.status_code != 200:
+        print(response.text)
+        raise Exception(f"Unexpected code {response.status_code}")
+
+
 # 用于批量发送，DALL-E 3 可以生成多张图片
 def send_to_tg_media_group(img_file_url_list, message, buttons):
     if len(img_file_url_list) < 1:
@@ -142,7 +151,15 @@ def get_random_image(gemini_key, unsplash_key, tg_key, tg_chat_id, open_ai_host,
 
     file_path_map = download_img(img_id, img_urls)
     tg_button = f'{{"inline_keyboard":[[{{"text":"View on Unsplash","url":"{link}"}}]]}}'
-    send_to_tg(file_path_map['full'], message, tg_button)
+    try:
+        send_to_tg(file_path_map['full'], message, tg_button)
+    except Exception as e:
+        print(e)
+        try:
+            send_to_tg(file_path_map['small'], message, tg_button)
+        except Exception as e:
+            print(e)
+            send_to_tg_msg('Failed to send image, please view on Unsplash: ' + link)
 
     prompt = response_text[0]['alt_description']
     if not prompt:
@@ -156,14 +173,14 @@ def get_random_image(gemini_key, unsplash_key, tg_key, tg_chat_id, open_ai_host,
 def download_img(img_id, img_urls):
     prepare_img_dir()
     full_img_url = img_urls['full']
-    small_img_url = img_urls['full']
+    small_img_url = img_urls['small']
 
     # tg 无法发送大图，不过也没必要了，有个 View on Unsplash 的按钮，可以直接跳转到原图
-    # img_response = requests.get(full_img_url)
-    # img_file_path = os.path.join(prepare_img_dir(), f"{img_id}.jpg")
-    # with open(img_file_path, "wb") as img_file:
-    #     img_file.write(img_response.content)
-    # img_file.close()
+    img_response = requests.get(full_img_url)
+    img_file_path = os.path.join(prepare_img_dir(), f"{img_id}.jpg")
+    with open(img_file_path, "wb") as img_file:
+        img_file.write(img_response.content)
+    img_file.close()
 
     small_img_response = requests.get(small_img_url)
     small_img_file_path = os.path.join(prepare_img_dir(), f"{img_id}_small.jpg")
@@ -172,7 +189,7 @@ def download_img(img_id, img_urls):
     small_img_file.close()
 
     return {
-        "full": small_img_file_path,
+        "full": img_file_path,
         "small": small_img_file_path
     }
 
