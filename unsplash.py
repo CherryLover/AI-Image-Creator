@@ -165,9 +165,11 @@ def get_random_image(gemini_key, unsplash_key, tg_key, tg_chat_id, open_ai_host,
     if not prompt:
         prompt = get_image_desc_by_gemini(file_path_map['small'])
     sd_path = generate_image_by_sd(prompt)
-    send_to_tg(sd_path, "Cloudflare Stable Diffusion Draw: " + prompt, None)
+    if sd_path:
+        send_to_tg(sd_path, "Cloudflare Stable Diffusion Draw: " + prompt, None)
     dalle_path = generate_image_by_dalle(prompt)
-    send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
+    if dalle_path:
+        send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
 
 
 def download_img(img_id, img_urls):
