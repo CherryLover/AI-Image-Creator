@@ -19,12 +19,6 @@ from urllib3.connection import HTTPConnection
 
 orientation_list = ["landscape", "portrait", "squarish"]
 
-GEMINI_KEY = "I"
-TG_KEY = "sdfsf"
-OPEN_AI_KEY = "sk-8"
-OPEN_AI_HOST = "api.openai.com"
-TG_CHAT_ID = 0
-
 
 def download_img_pure(url, file_name):
     img_response = requests.get(url)
@@ -42,9 +36,9 @@ def prepare_img_dir():
 
 
 def send_to_tg(img_file_path, message, buttons):
-    url = f'https://api.telegram.org/bot{TG_KEY}/sendPhoto?bot=AIImage'
+    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendPhoto?bot=AIImage'
     files = {'photo': open(img_file_path, 'rb')}
-    data = {'caption': message, 'chat_id': TG_CHAT_ID}
+    data = {'caption': message, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
     if buttons:
         data['reply_markup'] = buttons
     response = requests.post(url, files=files, data=data)
@@ -54,8 +48,8 @@ def send_to_tg(img_file_path, message, buttons):
 
 
 def send_to_tg_msg(message):
-    url = f'https://api.telegram.org/bot{TG_KEY}/sendMessage'
-    data = {'text': message, 'chat_id': TG_CHAT_ID}
+    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendMessage'
+    data = {'text': message, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
     response = requests.post(url, json=data)
     if response.status_code != 200:
         print(response.text)
@@ -66,11 +60,11 @@ def send_to_tg_msg(message):
 def send_to_tg_media_group(img_file_url_list, message, buttons):
     if len(img_file_url_list) < 1:
         return
-    url = f'https://api.telegram.org/bot{TG_KEY}/sendMediaGroup'
+    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendMediaGroup'
     media = []
     for img_file_url in img_file_url_list:
         media.append({'type': 'photo', 'media': img_file_url, 'caption': message, 'parse_mode': 'Markdown'})
-    data = {'media': media, 'chat_id': TG_CHAT_ID}
+    data = {'media': media, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
     if buttons:
         data['reply_markup'] = buttons
     response = requests.post(url, json=data)
@@ -105,7 +99,7 @@ def get_image_desc_by_gemini(file_path):
             }
         ]
     }
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key={GEMINI_KEY}"
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key={os.getenv("GEMINI_KEY", "")}'
     response = requests.post(url, json=json_data)
     if response.status_code != 200:
         raise Exception(f"Unexpected code {response.status_code}")
@@ -120,19 +114,8 @@ def get_image_desc_by_gemini(file_path):
     return response_text
 
 
-def get_random_image(gemini_key, unsplash_key, tg_key, tg_chat_id, open_ai_host, open_ai_key):
-    global GEMINI_KEY
-    GEMINI_KEY = gemini_key
-    global TG_KEY
-    TG_KEY = tg_key
-    global TG_CHAT_ID
-    TG_CHAT_ID = tg_chat_id
-    global OPEN_AI_KEY
-    OPEN_AI_KEY = open_ai_key
-    global OPEN_AI_HOST
-    OPEN_AI_HOST = open_ai_host
-    orientation = random.choice(orientation_list)
-    url = f'https://api.unsplash.com/photos/random?client_id={unsplash_key}&count=1&orientation={orientation}'
+def get_random_image():
+    url = f'https://api.unsplash.com/photos/random?client_id={os.getenv("UNSPLASH_KEY", "")}&count=1&orientation={random.choice(orientation_list)}'
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception(f"Unexpected code {response.status_code}")
@@ -216,7 +199,7 @@ def generate_image_by_sd(prompt):
 
 
 def generate_image_by_dalle(prompt):
-    url = f"https://{OPEN_AI_HOST}/v1/images/generations"
+    url = f'https://{os.getenv("OPEN_AI_HOST", "")}/v1/images/generations'
     final_prompt = f"{prompt}."
     print(f"finalPrompt: {final_prompt}\n")
     data = {
@@ -226,7 +209,7 @@ def generate_image_by_dalle(prompt):
         'size': '1024x1024'
     }
     head = {
-        'Authorization': f'Bearer {OPEN_AI_KEY}'
+        'Authorization': f'Bearer {os.getenv("OPEN_AI_KEY", "")}'
     }
     response = requests.post(url, json=data, headers=head)
     if response.status_code != 200:
