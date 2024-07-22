@@ -11,7 +11,7 @@ import base64
 import PIL.Image
 import time
 
-from urllib3.connection import HTTPConnection
+import tg_sender
 
 # logging.basicConfig(level=logging.DEBUG)
 # # 是否打印 header
@@ -33,44 +33,6 @@ def prepare_img_dir():
     dir_path = os.path.join(os.getcwd(), "unsplash_img")
     os.makedirs(dir_path, exist_ok=True)
     return dir_path
-
-
-def send_to_tg(img_file_path, message, buttons):
-    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendPhoto?bot=AIImage'
-    files = {'photo': open(img_file_path, 'rb')}
-    data = {'caption': message, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
-    if buttons:
-        data['reply_markup'] = buttons
-    response = requests.post(url, files=files, data=data)
-    if response.status_code != 200:
-        print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
-
-
-def send_to_tg_msg(message):
-    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendMessage'
-    data = {'text': message, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
-    response = requests.post(url, json=data)
-    if response.status_code != 200:
-        print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
-
-
-# 用于批量发送，DALL-E 3 可以生成多张图片
-def send_to_tg_media_group(img_file_url_list, message, buttons):
-    if len(img_file_url_list) < 1:
-        return
-    url = f'https://api.telegram.org/bot{os.getenv("TG_KEY", "")}/sendMediaGroup'
-    media = []
-    for img_file_url in img_file_url_list:
-        media.append({'type': 'photo', 'media': img_file_url, 'caption': message, 'parse_mode': 'Markdown'})
-    data = {'media': media, 'chat_id': os.getenv("TG_CHAT_ID", 0)}
-    if buttons:
-        data['reply_markup'] = buttons
-    response = requests.post(url, json=data)
-    if response.status_code != 200:
-        print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
 
 
 def get_image_desc_by_gemini(file_path):
@@ -135,24 +97,19 @@ def get_random_image():
     file_path_map = download_img(img_id, img_urls)
     tg_button = f'{{"inline_keyboard":[[{{"text":"View on Unsplash","url":"{link}"}}]]}}'
     try:
-        send_to_tg(file_path_map['full'], message, tg_button)
+        tg_sender.send_to_tg(file_path_map['full'], message, tg_button)
     except Exception as e:
         print(e)
         try:
-            send_to_tg(file_path_map['small'], message, tg_button)
+            tg_sender.send_to_tg(file_path_map['small'], message, tg_button)
         except Exception as e:
             print(e)
-            send_to_tg_msg('Failed to send image, please view on Unsplash: ' + link)
+            tg_sender.send_to_tg_msg('Failed to send image, please view on Unsplash: ' + link)
 
     prompt = response_text[0]['alt_description']
     if not prompt:
         prompt = get_image_desc_by_gemini(file_path_map['small'])
-    sd_path = generate_image_by_sd(prompt)
-    if sd_path:
-        send_to_tg(sd_path, "Cloudflare Stable Diffusion Draw: " + prompt, None)
-    dalle_path = generate_image_by_dalle(prompt)
-    if dalle_path:
-        send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
+    return prompt
 
 
 def download_img(img_id, img_urls):
@@ -177,55 +134,3 @@ def download_img(img_id, img_urls):
         "full": img_file_path,
         "small": small_img_file_path
     }
-
-
-def generate_image_by_sd(prompt):
-    url = "https://dpbot.jiwzdj.workers.dev/"
-
-    final_prompt = f"{prompt}."
-    print(f"finalPrompt: {final_prompt}\n")
-    data = {
-        'prompt': final_prompt
-    }
-    response = requests.post(url, json=data)
-    if response.status_code != 200:
-        return ""
-    file_path = os.path.join(prepare_img_dir(), f"sd_{int(time.time())}.png")
-    with open(file_path, "wb") as f:
-        f.write(response.content)
-    f.close()
-    print(f"file_path: {file_path}\n")
-    return file_path
-
-
-def generate_image_by_dalle(prompt):
-    url = f'https://{os.getenv("OPEN_AI_HOST", "")}/v1/images/generations'
-    final_prompt = f"{prompt}."
-    print(f"finalPrompt: {final_prompt}\n")
-    data = {
-        'prompt': final_prompt,
-        'n': 1,
-        'model': 'dall-e-3',
-        'size': '1024x1024'
-    }
-    head = {
-        'Authorization': f'Bearer {os.getenv("OPEN_AI_KEY", "")}'
-    }
-    response = requests.post(url, json=data, headers=head)
-    if response.status_code != 200:
-        print(f"request dalle failed {response.status_code}")
-        print(response.text)
-        return ""
-    print(response.json())
-    file_url = response.json()['data'][0]['url']
-    if not file_url:
-        return ""
-    response = requests.get(file_url)
-    if response.status_code != 200:
-        return ""
-    file_path = os.path.join(prepare_img_dir(), f"dalle_{int(time.time())}.png")
-    with open(file_path, "wb") as f:
-        f.write(response.content)
-    f.close()
-    print(f"file_path: {file_path}\n")
-    return file_path
