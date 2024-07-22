@@ -22,17 +22,17 @@ jobs:
         run: pip install -r requirements.txt
       - name: Set environment variables
         env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_KEY: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
-          OPENAI_HOST: ${{ secrets.OPENAI_HOST }}
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPEN_AI_HOST: ${{ secrets.OPENAI_HOST }}
+          OPEN_AI_KEY: ${{ secrets.OPENAI_KEY }}
         run: echo "Environment variables set"
       - name: Run script
         run: python main.py
         env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_KEY: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
-          OPENAI_HOST: ${{ secrets.OPENAI_HOST }}
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPEN_AI_HOST: ${{ secrets.OPENAI_HOST }}
+          OPEN_AI_KEY: ${{ secrets.OPENAI_KEY }}
