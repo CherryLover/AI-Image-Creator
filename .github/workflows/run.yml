@@ -31,6 +31,7 @@ jobs:
           CF_R2_API_KEY: ${{ secrets.CF_R2_API_KEY }}
           NOTION_KEY: ${{ secrets.NOTION_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          HUIYAN_MJ_KEY: ${{ secrets.HUIYAN_MJ_KEY }}
         run: echo "Environment variables set"
       - name: Run script
         run: python main.py
@@ -44,3 +45,4 @@ jobs:
           CF_R2_API_KEY: ${{ secrets.CF_R2_API_KEY }}
           NOTION_KEY: ${{ secrets.NOTION_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          HUIYAN_MJ_KEY: ${{ secrets.HUIYAN_MJ_KEY }}
