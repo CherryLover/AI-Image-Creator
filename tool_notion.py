@@ -168,7 +168,7 @@ def save_day_img(notion_args):
                         {
                             "type": "text",
                             "text": {
-                                "content": f"Upscale {str(index + 1)}"
+                                "content": f"Upscale {str(index)}"
                             }
                         }
                     ]
