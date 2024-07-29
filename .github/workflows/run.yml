@@ -27,6 +27,10 @@ jobs:
           UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
           OPEN_AI_HOST: ${{ secrets.OPENAI_HOST }}
           OPEN_AI_KEY: ${{ secrets.OPENAI_KEY }}
+          CF_R2_HOST: ${{ secrets.CF_R2_HOST }}
+          CF_R2_API_KEY: ${{ secrets.CF_R2_API_KEY }}
+          NOTION_KEY: ${{ secrets.NOTION_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: echo "Environment variables set"
       - name: Run script
         run: python main.py
@@ -36,3 +40,7 @@ jobs:
           UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
           OPEN_AI_HOST: ${{ secrets.OPENAI_HOST }}
           OPEN_AI_KEY: ${{ secrets.OPENAI_KEY }}
+          CF_R2_HOST: ${{ secrets.CF_R2_HOST }}
+          CF_R2_API_KEY: ${{ secrets.CF_R2_API_KEY }}
+          NOTION_KEY: ${{ secrets.NOTION_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
