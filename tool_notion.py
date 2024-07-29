@@ -69,7 +69,7 @@ def save_day_img(notion_args):
                 "object": "block",
                 "type": "heading_2",
                 "heading_2": {
-                    "text": [
+                    "rich_text": [
                         {
                             "type": "text",
                             "text": {
@@ -98,7 +98,7 @@ def save_day_img(notion_args):
             "object": "block",
             "type": "heading_2",
             "heading_2": {
-                "text": [
+                "rich_text": [
                     {
                         "type": "text",
                         "text": {
@@ -123,7 +123,7 @@ def save_day_img(notion_args):
             "object": "block",
             "type": "heading_2",
             "heading_2": {
-                "text": [
+                "rich_text": [
                     {
                         "type": "text",
                         "text": {
