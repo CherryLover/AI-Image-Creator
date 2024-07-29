@@ -11,7 +11,7 @@ def send_to_tg(img_file_path, message, buttons):
     response = requests.post(url, files=files, data=data)
     if response.status_code != 200:
         print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
+        print(f"send_to_tg Unexpected code {response.status_code}")
 
 
 def send_to_tg_msg(message):
@@ -20,7 +20,7 @@ def send_to_tg_msg(message):
     response = requests.post(url, json=data)
     if response.status_code != 200:
         print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
+        print(f"send_to_tg_msg Unexpected code {response.status_code}")
 
 
 # 用于批量发送，DALL-E 3 可以生成多张图片
@@ -37,4 +37,4 @@ def send_to_tg_media_group(img_file_url_list, message, buttons):
     response = requests.post(url, json=data)
     if response.status_code != 200:
         print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
+        print(f"send_to_tg_media_group Unexpected code {response.status_code}")
