@@ -67,6 +67,20 @@ def save_day_img(notion_args):
         "children": [
             {
                 "object": "block",
+                "type": "heading_2",
+                "heading_2": {
+                    "text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": "Unsplash"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "object": "block",
                 "type": "image",
                 "image": {
                     "type": "external",
@@ -82,6 +96,20 @@ def save_day_img(notion_args):
     if sd_path != '':
         data['children'].append({
             "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Cloudflare Stable Diffusion"
+                        }
+                    }
+                ]
+            }
+        })
+        data['children'].append({
+            "object": "block",
             "type": "image",
             "image": {
                 "type": "external",
@@ -91,6 +119,20 @@ def save_day_img(notion_args):
             }
         })
     if dalle_path != '':
+        data['children'].append({
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "DALL-E 3"
+                        }
+                    }
+                ]
+            }
+        })
         data['children'].append({
             "object": "block",
             "type": "image",
