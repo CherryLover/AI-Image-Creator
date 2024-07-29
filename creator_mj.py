@@ -11,12 +11,16 @@ def generate_mj(prompt):
     img_path_list = []
     result = {}
     task_id = submit_main_generate(prompt)
-    for i in range(1, 6):
+    for i in range(1, 20):
         print(f'query random {i}')
         result = query_result(task_id)
         if result:
             break
         time.sleep(30)
+
+    if not result:
+        print(f'generate_mj failed {prompt} spend too much time')
+        return img_path_list
 
     img_url = result['image_url']
     path = tool_download.download(img_url, "mj")
