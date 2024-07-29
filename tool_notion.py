@@ -20,7 +20,7 @@ def save_day_img(notion_args):
 
     cf_sd_path: Cloudflare Stable Diffusion 生成的图片路径
     dalle_path: DALL-E 3 生成的图片路径
-    mjml_path: Midjourney 生成的图片路径
+    mj_list: Midjourney 生成的图片路径集合
     :return:
     """
     url = "https://api.notion.com/v1/pages"
@@ -140,6 +140,47 @@ def save_day_img(notion_args):
                 "type": "external",
                 "external": {
                     "url": dalle_path
+                }
+            }
+        })
+    mj_list = notion_args['mj_list'] or []
+    data['children'].append({
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": "Midjourney"
+                    }
+                }
+            ]
+        }
+    })
+    for index, mj in enumerate(mj_list):
+        if index != 0:
+            data['children'].append({
+                "object": "block",
+                "type": "heading_3",
+                "heading_3": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": f"Upscale {str(index + 1)}"
+                            }
+                        }
+                    ]
+                }
+            })
+        data['children'].append({
+            "object": "block",
+            "type": "image",
+            "image": {
+                "type": "external",
+                "external": {
+                    "url": mj
                 }
             }
         })

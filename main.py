@@ -4,6 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import creator_cf_sd
 import creator_dalle
+import creator_mj
 import tg_sender
 import tool_cf_r2
 import tool_notion
@@ -41,5 +42,15 @@ if __name__ == '__main__':
         tg_sender.send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
         dalle_url = tool_cf_r2.save_file(dalle_path)
         notion_args['dalle_path'] = dalle_url
+
+    mj_list = creator_mj.generate_mj(prompt)
+    mj_url_list = []
+    for index, mj_path in enumerate(mj_list):
+        if index == 0:
+            tg_sender.send_to_tg(mj_path, "Midjourney Draw: " + prompt, None)
+        mj_url = tool_cf_r2.save_file(mj_path)
+        mj_url_list.append(mj_url)
+    notion_args["mj_list"] = mj_url_list
+
     tool_notion.save_day_img(notion_args)
 
