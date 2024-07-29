@@ -36,7 +36,7 @@ if __name__ == '__main__':
         sd_url = tool_cf_r2.save_file(sd_path)
         notion_args['cf_sd_path'] = sd_url
     dalle_path = creator_dalle.generate_image_by_dalle(prompt)
-    if dalle_path:
+    if dalle_path or dalle_path != "":
         tg_sender.send_to_tg(dalle_path, "Dall-E-3 Draw: " + prompt, None)
         dalle_url = tool_cf_r2.save_file(dalle_path)
         notion_args['dalle_path'] = dalle_url

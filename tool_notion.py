@@ -62,46 +62,6 @@ def save_day_img(notion_args):
             "UnsplashDownload": {
                 "number": notion_args['unsplash_count_download']
             }
-            # "Unsplash": {
-            #     "files": [
-            #         {
-            #             "name": "unsplash.jpg",
-            #             "external": {
-            #                 "url": notion_args['unsplash_path']
-            #             }
-            #         }
-            #     ]
-            # },
-            # "Cloudflare": {
-            #     "files": [
-            #         {
-            #             "name": "cf_sd.jpg",
-            #             "external": {
-            #                 "url": notion_args['cf_sd_path']
-            #             }
-            #         }
-            #     ]
-            # },
-            # "DALL-E": {
-            #     "files": [
-            #         {
-            #             "name": "dalle.jpg",
-            #             "external": {
-            #                 "url": notion_args['dalle_path']
-            #             }
-            #         }
-            #     ]
-            # },
-            # "Midjourney": {
-            #     "files": [
-            #         {
-            #             "name": "mjml.jpg",
-            #             "external": {
-            #                 "url": notion_args['mjml_path']
-            #             }
-            #         }
-            #     ]
-            # }
         },
         "children": [
             {
@@ -114,28 +74,32 @@ def save_day_img(notion_args):
                     }
                 }
             },
-            {
-                "object": "block",
-                "type": "image",
-                "image": {
-                    "type": "external",
-                    "external": {
-                        "url": notion_args['cf_sd_path']
-                    }
-                }
-            },
-            {
-                "object": "block",
-                "type": "image",
-                "image": {
-                    "type": "external",
-                    "external": {
-                        "url": notion_args['dalle_path']
-                    }
-                }
-            }
         ]
     }
+    sd_path = notion_args['cf_sd_path'] or ''
+    dalle_path = notion_args['dalle_path'] or ''
+    if sd_path != '':
+        data['children'].append({
+            "object": "block",
+            "type": "image",
+            "image": {
+                "type": "external",
+                "external": {
+                    "url": sd_path
+                }
+            }
+        })
+    if dalle_path != '':
+        data['children'].append({
+            "object": "block",
+            "type": "image",
+            "image": {
+                "type": "external",
+                "external": {
+                    "url": dalle_path
+                }
+            }
+        })
     response = requests.post(url, headers=headers, json=data)
     if response.status_code != 200:
         print(response.text)
