@@ -96,20 +96,31 @@ def get_random_image():
 
     file_path_map = download_img(img_id, img_urls)
     tg_button = f'{{"inline_keyboard":[[{{"text":"View on Unsplash","url":"{link}"}}]]}}'
+    file_path = ''
     try:
         tg_sender.send_to_tg(file_path_map['full'], message, tg_button)
+        file_path = file_path_map['full']
     except Exception as e:
         print(e)
         try:
             tg_sender.send_to_tg(file_path_map['small'], message, tg_button)
+            file_path = file_path_map['small']
         except Exception as e:
             print(e)
             tg_sender.send_to_tg_msg('Failed to send image, please view on Unsplash: ' + link)
 
     prompt = response_text[0]['alt_description']
+    print("prompt: " + prompt)
+    print("file_path: " + file_path)
     if not prompt:
         prompt = get_image_desc_by_gemini(file_path_map['small'])
-    return prompt
+    return {
+        "prompt": prompt,
+        "file_path": file_path,
+        "url": link,
+        "count_like": count_like,
+        "count_download": count_download,
+    }
 
 
 def download_img(img_id, img_urls):
