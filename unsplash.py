@@ -120,6 +120,7 @@ def get_random_image():
         "url": link,
         "count_like": count_like,
         "count_download": count_download,
+        "origin_url": file_path_map['full']
     }
 
 

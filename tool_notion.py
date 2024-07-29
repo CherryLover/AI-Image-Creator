@@ -71,7 +71,7 @@ def save_day_img(notion_args):
                 "image": {
                     "type": "external",
                     "external": {
-                        "url": notion_args['unsplash_path']
+                        "url": notion_args['unsplash_origin_url']
                     }
                 }
             },
