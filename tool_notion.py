@@ -103,5 +103,5 @@ def save_day_img(notion_args):
     response = requests.post(url, headers=headers, json=data)
     if response.status_code != 200:
         print(response.text)
-        raise Exception(f"Unexpected code {response.status_code}")
+        print(f"notion save page Unexpected code {response.status_code}")
     print(response.json())
