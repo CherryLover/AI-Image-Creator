@@ -12,14 +12,14 @@ def generate_mj(prompt):
     result = {}
     task_id = submit_main_generate(prompt)
     for i in range(1, 20):
-        print(f'query random {i}')
+        print(f'query random {i} for {task_id}')
         result = query_result(task_id)
         if result:
             break
         time.sleep(30)
 
     if not result:
-        print(f'generate_mj failed {prompt} spend too much time')
+        print(f'generate_mj failed ({prompt}) spend too much time')
         return img_path_list
 
     img_url = result['image_url']
@@ -55,6 +55,7 @@ def submit_main_generate(prompt):
         'Authorization': f'Bearer {os.getenv("HUIYAN_MJ_KEY", "")}'
     }
     response = requests.request("POST", url, headers=headers, data=payload)
+    print("submit_main_generate response code ", response.status_code)
     if response.status_code == 200:
         return response.json()['result']
 
@@ -91,7 +92,7 @@ def query_result(task_id):
         print(f"query_result({task_id}) failed {response.status_code}")
         return None
     response_json = response.json()
-    print(response_json)
+    print(f'query ({task_id}) response code 200')
     if response_json['status'] != 'SUCCESS':
         print(f"query_result({task_id}) failed {response_json['status']}")
         return None

@@ -144,20 +144,21 @@ def save_day_img(notion_args):
             }
         })
     mj_list = notion_args['mj_list'] or []
-    data['children'].append({
-        "object": "block",
-        "type": "heading_2",
-        "heading_2": {
-            "rich_text": [
-                {
-                    "type": "text",
-                    "text": {
-                        "content": "Midjourney"
+    if len(mj_list) != 0:
+        data['children'].append({
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Midjourney"
+                        }
                     }
-                }
-            ]
-        }
-    })
+                ]
+            }
+        })
     for index, mj in enumerate(mj_list):
         if index != 0:
             data['children'].append({
