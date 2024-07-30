@@ -54,3 +54,5 @@ if __name__ == '__main__':
 
     tool_notion.save_day_img(notion_args)
 
+    print("All Done!")
+

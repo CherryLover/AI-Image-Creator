@@ -11,6 +11,8 @@ def generate_mj(prompt):
     img_path_list = []
     result = {}
     task_id = submit_main_generate(prompt)
+    if not task_id:
+        return img_path_list
     for i in range(1, 20):
         print(f'query random {i} for {task_id}')
         result = query_result(task_id)
@@ -58,6 +60,7 @@ def submit_main_generate(prompt):
     print("submit_main_generate response code ", response.status_code)
     if response.status_code == 200:
         return response.json()['result']
+    return None
 
 
 def upscale(task_id, action_code):
