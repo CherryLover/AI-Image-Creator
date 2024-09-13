@@ -1,6 +1,6 @@
 # AI-Image-Creator
 
-此仓库用于生成 AI 图片，发送到 Telegram bot，并保存至 [Notion 页面](https://daily-ai-img.flyooo.uk/)。
+此仓库用于生成 AI 图片，发送到 Telegram bot 生成[极简阅读站](https://daily-ai-draw.flyooo.uk/)，同时保存至 [Notion 公开页面](https://daily-ai-img.flyooo.uk/)。
 
 1. 去 unsplash.com 随机获取一张图片，并保存其内容描述
 2. 使用 Stable Diffusion 生成图片
