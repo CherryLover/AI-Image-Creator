@@ -10,10 +10,16 @@ def prepare_img_dir():
 
 
 def download(url, file_name_prefix):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except requests.exceptions.SSLError:
+        # SSL证书错误时，尝试使用http
+        url = url.replace('https://', 'http://', 1)
+        response = requests.get(url)
+    
     file_path = os.path.join(prepare_img_dir(), f"{file_name_prefix}_{int(time.time())}.png")
     with open(file_path, "wb") as f:
         f.write(response.content)
-    f.close()
+
     print(f"file_path: {file_path}\n")
     return file_path
