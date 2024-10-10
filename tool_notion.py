@@ -234,8 +234,7 @@ def save_day_img(notion_args):
             "path": notion_args['unsplash_path'],
             "origin_url": notion_args['unsplash_origin_url'],
             "count_like": notion_args['unsplash_count_like'],
-            "count_download": notion_args['unsplash_count_download'],
-            "count_view": notion_args['unsplash_count_view'],
+            "count_download": notion_args['unsplash_count_download']
         },
         "cf_sd_path": notion_args['cf_sd_path'],
         "dalle_path": notion_args['dalle_path'],
