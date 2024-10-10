@@ -223,7 +223,14 @@ def save_day_img(notion_args):
         "type": "code",
         "code": {
             "language": "markdown",
-            "text": md_text
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": md_text
+                    }
+                }
+            ]
         }
     })
     # page json
@@ -260,7 +267,14 @@ def save_day_img(notion_args):
         "type": "code",
         "code": {
             "language": "json",
-            "text": json.dumps(page_json)
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": json.dumps(page_json)
+                    }
+                }
+            ]
         }
     })
     print(json.dumps(data))
