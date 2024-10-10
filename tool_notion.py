@@ -185,6 +185,85 @@ def save_day_img(notion_args):
                 }
             }
         })
+
+    md_text = f"今日{today} AI 绘图"
+    md_text += f"\n\n 提示词：\n\n{notion_args['prompt']}"
+    md_text += "\n\n ## Unsplash"
+    md_text += f"\n\n[Unsplash 原图]({notion_args['unsplash_origin_url']})"
+    if sd_path != '':
+        md_text += "\n\n ## Cloudflare Stable Diffusion"
+        md_text += f"\n\n![Cloudflare Stable Diffusion]({sd_path})"
+    if dalle_path != '':
+        md_text += "\n\n ## DALL-E 3"
+        md_text += f"\n\n![DALL-E 3]({dalle_path})"
+    if len(mj_list) != 0:
+        md_text += "\n\n ## Midjourney"
+    for index, mj in enumerate(mj_list):
+        if index != 0:
+            md_text += f"\n\n ### Upscale {str(index)}"
+        md_text += f"\n\n![Midjourney]({mj})"
+
+    data['children'].append({
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": "Markdown"
+                    }
+                }
+            ]
+        }
+    })
+    # insert md as code
+    data['children'].append({
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "markdown",
+            "text": md_text
+        }
+    })
+    # page json
+    page_json = {
+        "prompt": notion_args['prompt'],
+        "unsplash": {
+            "url": notion_args['unsplash_url'],
+            "path": notion_args['unsplash_path'],
+            "origin_url": notion_args['unsplash_origin_url'],
+            "count_like": notion_args['unsplash_count_like'],
+            "count_download": notion_args['unsplash_count_download'],
+            "count_view": notion_args['unsplash_count_view'],
+        },
+        "cf_sd_path": notion_args['cf_sd_path'],
+        "dalle_path": notion_args['dalle_path'],
+        "mj_list": notion_args['mj_list']
+    }
+    data['children'].append({
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": "JSON"
+                    }
+                }
+            ]
+        }
+    })
+    # insert json as code
+    data['children'].append({
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "json",
+            "text": json.dumps(page_json)
+        }
+    })
     print(json.dumps(data))
     response = requests.post(url, headers=headers, json=data)
     if response.status_code != 200:
