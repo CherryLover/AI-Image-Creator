@@ -3,6 +3,37 @@ import os
 import time
 
 import requests
+from dotenv import load_dotenv
+
+
+def prompt_exist(prompt):
+    url = "https://api.notion.com/v1/databases/" + os.getenv('NOTION_DATABASE_ID', '') + "/query"
+    headers = {
+        'Authorization': f"Bearer {os.getenv('NOTION_KEY', '')}",
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-02-22'
+    }
+    data = {
+        "filter": {
+            "and": [{
+                "property": "Prompt",
+                "rich_text": {
+                    "equals": prompt,
+                }
+            }]
+
+        }
+    }
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 200:
+        results = response.json().get('results', [])
+        return len(results) > 0
+    else:
+        print(f"请求失败，状态码：{response.status_code}")
+        print(response.text)
+        return False
+
 
 
 def save_day_img(notion_args):
@@ -283,3 +314,9 @@ def save_day_img(notion_args):
         print(response.text)
         print(f"notion save page Unexpected code {response.status_code}")
     print(response.json())
+
+
+if __name__ == '__main__':
+    # 加载 .env 文件
+    load_dotenv()
+    print("prompt exist ", prompt_exist("A mountain with a building on top of it"))
