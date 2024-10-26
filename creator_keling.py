@@ -7,17 +7,12 @@ from dotenv import load_dotenv
 
 import tool_download
 
-# 填写access key
-ak = ""
-# 填写secret key
-sk = ""
-
 jwt_token = ""
 
 base_url = "https://api.klingai.com"
 
 
-def encode_jwt_token(ak, sk):
+def encode_jwt_token():
     global jwt_token
     if jwt_token != "":
         return jwt_token
@@ -25,6 +20,10 @@ def encode_jwt_token(ak, sk):
         "alg": "HS256",
         "typ": "JWT"
     }
+    ak = os.getenv("KELING_AK", "")
+    sk = os.getenv("KELING_SK", "")
+    print("ak is empty ", str(ak == ""))
+    print("sk is empty ", str(ak == ""))
     payload = {
         "iss": ak,
         "exp": int(time.time()) + 18000,  # 有效时间，此处示例代表当前时间+1800s(30min)
@@ -36,7 +35,7 @@ def encode_jwt_token(ak, sk):
 
 
 def generate_headers():
-    token = encode_jwt_token(ak, sk)
+    token = encode_jwt_token()
     headers = {
         "Authorization": "Bearer " + token,
         "Content-Type": "application/json"
@@ -116,8 +115,6 @@ def download_list(list):
 
 
 def draw(prompt):
-    ak = os.getenv("KELING_AK")
-    sk = os.getenv("KELING_SK")
     task_id = submit_job(prompt)
     if task_id == "":
         return []
