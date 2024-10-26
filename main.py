@@ -4,6 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import creator_cf_sd
 import creator_dalle
+import creator_keling
 import creator_mj
 import tg_sender
 import tool_cf_r2
@@ -52,7 +53,14 @@ if __name__ == '__main__':
         mj_url_list.append(mj_url)
     notion_args["mj_list"] = mj_url_list
 
+    keling_result_list = creator_keling.draw(prompt)
+    keling_url_list = []
+    for index, keling_path in enumerate(keling_result_list):
+        tg_sender.send_to_tg(keling_path, f"Keling Draw {index + 1}: " + prompt, None)
+        keling_url = tool_cf_r2.save_file(keling_path)
+        keling_url_list.append(keling_url)
+    notion_args["keling_list"] = keling_url_list
+
     tool_notion.save_day_img(notion_args)
 
     print("All Done!")
-

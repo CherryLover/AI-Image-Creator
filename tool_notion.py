@@ -52,6 +52,7 @@ def save_day_img(notion_args):
     cf_sd_path: Cloudflare Stable Diffusion 生成的图片路径
     dalle_path: DALL-E 3 生成的图片路径
     mj_list: Midjourney 生成的图片路径集合
+    keling_list: Keling 生成的图片路径集合
     :return:
     """
     url = "https://api.notion.com/v1/pages"
@@ -217,6 +218,49 @@ def save_day_img(notion_args):
             }
         })
 
+    # 在添加 Midjourney 图片后，添加 Keling 图片
+    keling_list = notion_args.get('keling_list', [])
+    if len(keling_list) != 0:
+        data['children'].append({
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "可灵"
+                        }
+                    }
+                ]
+            }
+        })
+    for index, keling in enumerate(keling_list):
+        data['children'].append({
+            "object": "block",
+            "type": "heading_3",
+            "heading_3": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": f"可灵 Image {index + 1}"
+                        }
+                    }
+                ]
+            }
+        })
+        data['children'].append({
+            "object": "block",
+            "type": "image",
+            "image": {
+                "type": "external",
+                "external": {
+                    "url": keling
+                }
+            }
+        })
+
     md_text = f"今日{today} AI 绘图"
     md_text += f"\n\n 提示词：\n\n{notion_args['prompt']}"
     md_text += "\n\n ## Unsplash"
@@ -233,6 +277,11 @@ def save_day_img(notion_args):
         if index != 0:
             md_text += f"\n\n ### Upscale {str(index)}"
         md_text += f"\n\n![Midjourney]({mj})"
+    if len(keling_list) != 0:
+        md_text += "\n\n ## Keling"
+    for index, keling in enumerate(keling_list):
+        md_text += f"\n\n ### 可灵 Image {index + 1}"
+        md_text += f"\n\n![可灵]({keling})"
 
     data['children'].append({
         "object": "block",
@@ -276,7 +325,8 @@ def save_day_img(notion_args):
         },
         "cf_sd_path": notion_args['cf_sd_path'],
         "dalle_path": notion_args['dalle_path'],
-        "mj_list": notion_args['mj_list']
+        "mj_list": notion_args['mj_list'],
+        "keling_list": notion_args['keling_list']
     }
     data['children'].append({
         "object": "block",

@@ -32,8 +32,10 @@ jobs:
           NOTION_KEY: ${{ secrets.NOTION_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           HUIYAN_MJ_KEY: ${{ secrets.HUIYAN_MJ_KEY }}
-        run: echo "Environment variables set"
-      - name: Run script
+          KELING_AK: ${{ secrets.KELING_AK }}
+          KELING_SK: ${{ secrets.KELING_SK }}
+        run: echo "环境变量已设置"
+      - name: 运行脚本
         run: python main.py
         env:
           TG_KEY: ${{ secrets.TG_BOT_TOKEN }}
@@ -46,3 +48,5 @@ jobs:
           NOTION_KEY: ${{ secrets.NOTION_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           HUIYAN_MJ_KEY: ${{ secrets.HUIYAN_MJ_KEY }}
+          KELING_AK: ${{ secrets.KELING_AK }}
+          KELING_SK: ${{ secrets.KELING_SK }}
